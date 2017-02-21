@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', function(){
 		'Question 1?',
 		'Question 2?'
 	];
-	var addQuestion = function(){
-		questions.push('Hello, world?');
+	var addQuestion = function(event){
+		questions.push(event.target.value);
 	};
 	m.mount($questions, {
 		view: function(){
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function(){
 					return m('li', question);
 				}),
 				m('li', [
-					m('button', {onclick: addQuestion}, 'Hello?')
+					m('input', {onkeyup: addQuestion})
 				])
 			]
 		}
