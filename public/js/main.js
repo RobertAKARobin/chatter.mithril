@@ -2,5 +2,8 @@
 
 document.addEventListener('DOMContentLoaded', function(){
 	var $questions = document.getElementById('questions');
-	m.render($questions, 'Hello, world.');
+	m.render($questions, [
+		m('li', 'Question 1?'),
+		m('li', 'Question 2?')
+	]);
 });
