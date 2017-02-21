@@ -7,7 +7,11 @@ document.addEventListener('DOMContentLoaded', function(){
 		'Question 2?'
 	];
 	var addQuestion = function(event){
-		questions.push(event.target.value);
+		var input = event.target;
+		var isReturn = (event.keyCode == 13);
+		if(isReturn){
+			questions.push(input.value);
+		}
 	};
 	m.mount($questions, {
 		view: function(){
