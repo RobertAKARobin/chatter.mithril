@@ -1,5 +1,6 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', function(){
-	console.log('Hello, world.');
+	var $questions = document.getElementById('questions');
+	m.render($questions, 'Hello, world.');
 });
