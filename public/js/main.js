@@ -6,15 +6,19 @@ document.addEventListener('DOMContentLoaded', function(){
 		'Question 1?',
 		'Question 2?'
 	];
-	var sayHello = function(){
-		console.log('Hello, world!');
+	var addQuestion = function(){
+		questions.push('Hello, world?');
 	};
-	m.render($questions, [
-		questions.map(function(question){
-			return m('li', question);
-		}),
-		m('li', [
-			m('button', {onclick: sayHello}, 'Hello?')
-		])
-	]);
+	m.mount($questions, {
+		view: function(){
+			return [
+				questions.map(function(question){
+					return m('li', question);
+				}),
+				m('li', [
+					m('button', {onclick: addQuestion}, 'Hello?')
+				])
+			]
+		}
+	});
 });
