@@ -2,10 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function(){
 	var $questions = document.getElementById('questions');
-	var questions = [
-		'Question 1?',
-		'Question 2?'
-	];
+	var questions = [];
 	var addQuestion = function(event){
 		var input = event.target;
 		var isReturn = (event.keyCode == 13);
@@ -25,5 +22,8 @@ document.addEventListener('DOMContentLoaded', function(){
 				])
 			]
 		}
+	});
+	m.request('./questions').then(function(response){
+		questions = response;
 	});
 });
