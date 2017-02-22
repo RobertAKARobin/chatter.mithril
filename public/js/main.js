@@ -9,7 +9,10 @@ document.addEventListener('DOMContentLoaded', function(){
 		if(isReturn && input.value){
 			m.request({
 				method: 'POST',
-				url: './questions'
+				url: './questions',
+				data: {
+					question: input.value
+				}
 			}).then(function(response){
 				if(response.success){
 					console.log('This POST worked!');
