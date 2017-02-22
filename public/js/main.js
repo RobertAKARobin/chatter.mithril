@@ -9,8 +9,9 @@ document.addEventListener('DOMContentLoaded', function(){
 	var addQuestion = function(event){
 		var input = event.target;
 		var isReturn = (event.keyCode == 13);
-		if(isReturn){
+		if(isReturn && input.value){
 			questions.push(input.value);
+			input.value = '';
 		}
 	};
 	m.mount($questions, {
