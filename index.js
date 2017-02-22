@@ -14,3 +14,4 @@ app
 
 app
 	.get('/questions', (req, res) => res.json(db.questions))
+	.post('/questions', (req, res) => res.json({success: true}))

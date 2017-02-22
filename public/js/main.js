@@ -7,6 +7,14 @@ document.addEventListener('DOMContentLoaded', function(){
 		var input = event.target;
 		var isReturn = (event.keyCode == 13);
 		if(isReturn && input.value){
+			m.request({
+				method: 'POST',
+				url: './questions'
+			}).then(function(response){
+				if(response.success){
+					console.log('This POST worked!');
+				}
+			});
 			questions.push(input.value);
 			input.value = '';
 		}
