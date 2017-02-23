@@ -19,12 +19,15 @@ document.addEventListener('DOMContentLoaded', function(){
 					console.log('This POST worked!');
 				}
 			});
-			questions.push(input.value);
 			input.value = '';
 		}
 	};
 	socket.on('greeting', function(data){
 		console.log(data.message);
+	});
+	socket.on('newQuestion', function(data){
+		questions.push(data.question);
+		m.redraw();
 	});
 	m.mount($questions, {
 		view: function(){

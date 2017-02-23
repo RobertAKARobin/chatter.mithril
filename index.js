@@ -31,6 +31,10 @@ httpServer
 httpServer
 	.get('/questions', (req, res) => res.json(db.questions))
 	.post('/questions', (req, res) => {
-		db.questions.push(req.body.question)
+		const question = req.body.question
+		db.questions.push(question)
+		socketServer.sockets.emit('newQuestion', {
+			question
+		})
 		res.json({success: true})
 	})
