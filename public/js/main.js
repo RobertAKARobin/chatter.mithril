@@ -1,6 +1,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', function(){
+	var socket = io('http://localhost:3000');
 	var $questions = document.getElementById('questions');
 	var questions = [];
 	var addQuestion = function(event){
@@ -22,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function(){
 			input.value = '';
 		}
 	};
+	socket.on('greeting', function(data){
+		console.log(data.message);
+	});
 	m.mount($questions, {
 		view: function(){
 			return [
