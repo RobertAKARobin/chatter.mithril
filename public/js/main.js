@@ -1,47 +1,63 @@
 'use strict';
 
-document.addEventListener('DOMContentLoaded', function(){
-	var socket = io('http://localhost:3000');
-	var $questions = document.getElementById('questions');
-	var questions = [];
-	var addQuestion = function(event){
+var QuestionList = (function(){
+	var $instance = {};
+	$instance.event = {};
+	$instance.view = {};
+
+	$instance.all = [];
+	$instance.save = function(input){
+		return m.request({
+			method: 'POST',
+			url: './questions',
+			data: input
+		});
+	};
+	$instance.loadAll = function(){
+		m.request('./questions').then(function(input){
+			QuestionList.all = input.questions;
+		});
+		return QuestionList;
+	};
+	$instance.mountTo = function(element){
+		m.mount(element, {
+			view: QuestionList.view.list
+		});
+		return QuestionList;
+	}
+
+	$instance.event.save = function(event){
 		var input = event.target;
 		var isReturn = (event.keyCode == 13);
 		if(isReturn && input.value){
-			m.request({
-				method: 'POST',
-				url: './questions',
-				data: {
-					question: input.value
-				}
-			}).then(function(response){
-				if(response.success){
-					console.log('This POST worked!');
-				}
-			});
+			QuestionList.save({question: input.value});
 			input.value = '';
 		}
 	};
-	socket.on('greeting', function(data){
-		console.log(data.message);
-	});
+	$instance.view.list = function(){
+		return [
+			QuestionList.all.map(function(question){
+				return m('li', question);
+			}),
+			m('li', [
+				m('input', {onkeyup: QuestionList.event.save})
+			])
+		];
+	};
+
+	return $instance;
+})();
+
+
+document.addEventListener('DOMContentLoaded', function(){
+	var socket = io('http://localhost:3000');
+
+	QuestionList
+		.loadAll()
+		.mountTo(document.getElementById('questions'));
+
 	socket.on('newQuestion', function(data){
-		questions.push(data.question);
+		QuestionList.all.push(data.question);
 		m.redraw();
-	});
-	m.mount($questions, {
-		view: function(){
-			return [
-				questions.map(function(question){
-					return m('li', question);
-				}),
-				m('li', [
-					m('input', {onkeyup: addQuestion})
-				])
-			]
-		}
-	});
-	m.request('./questions').then(function(response){
-		questions = response;
 	});
 });

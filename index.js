@@ -29,7 +29,11 @@ httpServer
 	.use(bodyParser.json())
 
 httpServer
-	.get('/questions', (req, res) => res.json(db.questions))
+	.get('/questions', (req, res) => {
+		res.json({
+			questions: db.questions
+		})
+	})
 	.post('/questions', (req, res) => {
 		const question = req.body.question
 		db.questions.push(question)
