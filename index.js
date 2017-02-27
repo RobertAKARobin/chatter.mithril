@@ -8,8 +8,12 @@ const baseServer = http.createServer(httpServer)
 const socketServer = socketio(baseServer)
 const db = {
 	questions: [
-		'Is the API working?',
-		'Is the API still working?'
+		{
+			text: 'Is the API working?'
+		},
+		{
+			text: 'Is the API still working?'
+		}
 	]
 }
 
