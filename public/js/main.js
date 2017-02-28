@@ -34,6 +34,7 @@ var QuestionList = (function(){
 	$instance.event.save = function(event){
 		var input = event.target;
 		var isReturn = (event.keyCode == 13);
+		event.redraw = false;
 		if(isReturn && input.value){
 			QuestionList.save({
 				question: {
