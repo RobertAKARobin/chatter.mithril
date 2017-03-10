@@ -1,42 +1,34 @@
 'use strict';
 
 var QuestionList = (function(){
-	var $instance = {};
-	$instance.event = {};
-
-	$instance.all = [];
-	$instance.save = function(input){
+	var list = {};
+	list.event = {};
+	list.all = [];
+	list.save = function(input){
 		return m.request({
 			method: 'POST',
 			url: './questions',
 			data: input
 		});
-	};
-	$instance.loadAll = function(){
+	}
+	list.loadAll = function(){
 		m.request('./questions').then(function(input){
 			var i, l = input.questions.length;
 			for(i = 0; i < l; i++){
-				QuestionList.push(input.questions[i]);
+				list.push(input.questions[i]);
 			}
 		});
-		return QuestionList;
+		return list;
 	};
-	$instance.push = function(question){
-		QuestionList.all.push(Question.create(question));
+	list.push = function(question){
+		list.all.push(question);
 	}
-	$instance.mountTo = function(element){
-		m.mount(element, {
-			view: QuestionList.view
-		});
-		return QuestionList;
-	}
-
-	$instance.event.save = function(event){
+	list.event.save = function(event){
 		var input = event.target;
 		var isReturn = (event.keyCode == 13);
 		event.redraw = false;
 		if(isReturn && input.value){
-			QuestionList.save({
+			list.save({
 				question: {
 					text: input.value
 				}
@@ -44,52 +36,25 @@ var QuestionList = (function(){
 			input.value = '';
 		}
 	};
-	$instance.view = function(){
+
+	list.view = function(){
 		return [
-			QuestionList.all.map(function(question){
-				return m('li', question.view());
+			list.all.map(function(question){
+				return m('li', question.text);
 			}),
 			m('li', [
-				m('input', {onkeyup: QuestionList.event.save})
+				m('input', {onkeyup: list.event.save})
 			])
 		];
-	};
-
-	return $instance;
-})();
-
-var Question = (function(){
-	var $Class = {};
-	var $instance = {};
-
-	$Class.create = function(){
-		var instance = Object.create($instance);
-		instance.$Class = $Class;
-		instance.construct.apply(instance, arguments);
-		return instance;
 	}
 
-	$instance.construct = function(db){
-		var instance = this;
-		instance.db = db;
-	}
-	$instance.view = function(){
-		var instance = this;
-		return [
-			m('h2', instance.db.text)
-		];
-	};
-
-	return $Class;
+	return list;
 })();
-
 
 document.addEventListener('DOMContentLoaded', function(){
 	var socket = io('http://localhost:3000');
 
-	QuestionList
-		.loadAll()
-		.mountTo(document.getElementById('questions'));
+	m.mount(document.getElementById('questions'), QuestionList.loadAll());
 
 	socket.on('newQuestion', function(data){
 		QuestionList.push(data.question);
