@@ -1,5 +1,7 @@
 'use strict';
 
+var socket = io('http://localhost:3000');
+
 var QuestionList = (function(){
 	var list = {};
 	list.event = {};
@@ -11,15 +13,6 @@ var QuestionList = (function(){
 			data: input
 		});
 	}
-	list.loadAll = function(){
-		m.request('./questions').then(function(input){
-			var i, l = input.questions.length;
-			for(i = 0; i < l; i++){
-				list.push(input.questions[i]);
-			}
-		});
-		return list;
-	};
 	list.push = function(question){
 		list.all.push(question);
 	}
@@ -37,7 +30,22 @@ var QuestionList = (function(){
 		}
 	};
 
-	list.view = function(){
+	var component = {};
+	component.oninit = function(){
+		m.request('/questions').then(function(input){
+			var i, l = input.questions.length;
+			for(i = 0; i < l; i++){
+				list.push(input.questions[i]);
+			}
+		});
+	}
+	component.oncreate = function(){
+		socket.on('newQuestion', function(data){
+			list.push(data.question);
+			m.redraw();
+		});
+	}
+	component.view = function(){
 		return [
 			list.all.map(function(question){
 				return m('li', question.text);
@@ -47,17 +55,9 @@ var QuestionList = (function(){
 			])
 		];
 	}
-
-	return list;
+	return component;
 })();
 
 document.addEventListener('DOMContentLoaded', function(){
-	var socket = io('http://localhost:3000');
-
-	m.mount(document.getElementById('questions'), QuestionList.loadAll());
-
-	socket.on('newQuestion', function(data){
-		QuestionList.push(data.question);
-		m.redraw();
-	});
+	m.mount(document.getElementById('questions'), QuestionList);
 });
