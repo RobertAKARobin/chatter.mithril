@@ -32,7 +32,7 @@ var QuestionList = (function(){
 
 	var component = {};
 	component.view = function(){
-		return [
+		return m('ul', [
 			list.all.map(function(question){
 				return m('li', [
 					m('a', {
@@ -44,7 +44,7 @@ var QuestionList = (function(){
 			m('li', [
 				m('input', {onkeyup: events.save})
 			])
-		];
+		]);
 	}
 	component.oninit = function(){
 		list.reset();
@@ -101,7 +101,7 @@ var Header = (function(){
 
 document.addEventListener('DOMContentLoaded', function(){
 	m.mount(document.getElementById('header'), Header);
-	m.route(document.getElementById('questions'), '/', {
+	m.route(document.getElementById('main'), '/', {
 		'/': QuestionList,
 		'/question/:id': Question
 	});
