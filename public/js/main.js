@@ -48,7 +48,12 @@ var QuestionList = (function(){
 	component.view = function(){
 		return [
 			list.all.map(function(question){
-				return m('li', question.id + ' ' + question.text);
+				return m('li', [
+					m('a', {
+						href: '/question/' + question.id,
+						oncreate: m.route.link
+					}, question.id + ' ' + question.text)
+				]);
 			}),
 			m('li', [
 				m('input', {onkeyup: list.event.save})
@@ -58,8 +63,28 @@ var QuestionList = (function(){
 	return component;
 })();
 
+var Question = (function(){
+	var question = {};
+
+	var component = {};
+	component.oninit = function(vnode){
+		m.request('/question/' + vnode.attrs.id).then(function(input){
+			question.data = input.question;
+		});
+	}
+	component.view = function(){
+		if(question.data){
+			return m('h1', question.data.id + ': ' + question.data.text);
+		}else{
+			return m('h1', 'Loading...');
+		}
+	}
+	return component;
+})();
+
 document.addEventListener('DOMContentLoaded', function(){
 	m.route(document.getElementById('questions'), '/', {
-		'/': QuestionList
+		'/': QuestionList,
+		'/question/:id': Question
 	});
 });
