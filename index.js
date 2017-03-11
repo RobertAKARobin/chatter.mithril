@@ -31,13 +31,6 @@ new function seed(){
 baseServer
 	.listen('3000', () => console.log(Date().toLocaleString()))
 
-socketServer
-	.on('connect', (client) => {
-		client.emit('greeting', {
-			message: 'Hello, from the back-end!'
-		})
-	})
-
 httpServer
 	.use('/', express.static('./public'))
 	.use('/vendor', express.static('./node_modules'))
