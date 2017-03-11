@@ -32,6 +32,7 @@ var QuestionList = (function(){
 
 	var component = {};
 	component.oninit = function(){
+		list.all = [];
 		m.request('/questions').then(function(input){
 			var i, l = input.questions.length;
 			for(i = 0; i < l; i++){
@@ -82,7 +83,21 @@ var Question = (function(){
 	return component;
 })();
 
+var Header = (function(){
+	var component = {};
+	component.view = function(){
+		return m('h1', [
+			m('a', {
+				href: '/',
+				oncreate: m.route.link
+			}, 'Home')
+		]);
+	}
+	return component;
+})();
+
 document.addEventListener('DOMContentLoaded', function(){
+	m.mount(document.getElementById('header'), Header);
 	m.route(document.getElementById('questions'), '/', {
 		'/': QuestionList,
 		'/question/:id': Question
