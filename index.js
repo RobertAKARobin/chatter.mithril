@@ -7,19 +7,25 @@ const httpServer = express()
 const baseServer = http.createServer(httpServer)
 const socketServer = socketio(baseServer)
 const db = {
-	questions: []
+	questions: {}
+}
+
+let questionID = 0
+function addQuestionListItem(text){
+	questionID += 1
+	const question = {
+		id: questionID,
+		text: text
+	}
+	db.questions[questionID] = question
+	return question
 }
 
 new function seed(){
 	[
 		'Is the API working?',
 		'Is the API still working?'
-	].forEach((question, index) => {
-		db.questions.push({
-			id: index,
-			text: question
-		})
-	})
+	].forEach(addQuestionListItem)
 }
 
 baseServer
@@ -40,21 +46,17 @@ httpServer
 httpServer
 	.get('/questions', (req, res) => {
 		res.json({
-			questions: db.questions
+			questions: Object.values(db.questions)
 		})
 	})
 	.post('/questions', (req, res) => {
-		const question = req.body.question
-		question.id = db.questions.length;
-		db.questions.push(question)
 		socketServer.sockets.emit('newQuestion', {
-			question
+			question: addQuestionListItem(req.body.question.text)
 		})
 		res.json({success: true})
 	})
 	.get('/question/:id', (req, res) => {
-		const question = db.questions[req.params.id]
 		res.json({
-			question
+			question: db.questions[req.params.id]
 		})
 	})
