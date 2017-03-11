@@ -48,7 +48,7 @@ var QuestionList = (function(){
 	component.view = function(){
 		return [
 			list.all.map(function(question){
-				return m('li', question.text);
+				return m('li', question.id + ' ' + question.text);
 			}),
 			m('li', [
 				m('input', {onkeyup: list.event.save})

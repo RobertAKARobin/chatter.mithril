@@ -7,14 +7,19 @@ const httpServer = express()
 const baseServer = http.createServer(httpServer)
 const socketServer = socketio(baseServer)
 const db = {
-	questions: [
-		{
-			text: 'Is the API working?'
-		},
-		{
-			text: 'Is the API still working?'
-		}
-	]
+	questions: []
+}
+
+new function seed(){
+	[
+		'Is the API working?',
+		'Is the API still working?'
+	].forEach((question, index) => {
+		db.questions.push({
+			id: index,
+			text: question
+		})
+	})
 }
 
 baseServer
@@ -40,6 +45,7 @@ httpServer
 	})
 	.post('/questions', (req, res) => {
 		const question = req.body.question
+		question.id = db.questions.length;
 		db.questions.push(question)
 		socketServer.sockets.emit('newQuestion', {
 			question
