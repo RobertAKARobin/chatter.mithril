@@ -43,12 +43,6 @@ httpServer
 			questions: db.questions
 		})
 	})
-	.get('/question/:id', (req, res) => {
-		const question = db.questions[req.params.id]
-		res.json({
-			question
-		})
-	})
 	.post('/questions', (req, res) => {
 		const question = req.body.question
 		question.id = db.questions.length;
@@ -57,4 +51,10 @@ httpServer
 			question
 		})
 		res.json({success: true})
+	})
+	.get('/question/:id', (req, res) => {
+		const question = db.questions[req.params.id]
+		res.json({
+			question
+		})
 	})

@@ -4,7 +4,9 @@ var socket = io('http://localhost:3000');
 
 var QuestionList = (function(){
 	var list = {};
-	list.event = {};
+	list.reset = function(){
+		list.all = [];
+	}
 	list.save = function(input){
 		return m.request({
 			method: 'POST',
@@ -12,7 +14,9 @@ var QuestionList = (function(){
 			data: input
 		});
 	}
-	list.event.save = function(event){
+
+	var events = {};
+	events.save = function(event){
 		var input = event.target;
 		var isReturn = (event.keyCode == 13);
 		event.redraw = false;
@@ -27,8 +31,23 @@ var QuestionList = (function(){
 	};
 
 	var component = {};
+	component.view = function(){
+		return [
+			list.all.map(function(question){
+				return m('li', [
+					m('a', {
+						href: '/question/' + question.id,
+						oncreate: m.route.link
+					}, question.id + ' ' + question.text)
+				]);
+			}),
+			m('li', [
+				m('input', {onkeyup: events.save})
+			])
+		];
+	}
 	component.oninit = function(){
-		list.all = [];
+		list.reset();
 		m.request('/questions').then(function(input){
 			var i, l = input.questions.length;
 			for(i = 0; i < l; i++){
@@ -44,21 +63,6 @@ var QuestionList = (function(){
 	}
 	component.onremove = function(){
 		socket.off('newQuestion');
-	}
-	component.view = function(){
-		return [
-			list.all.map(function(question){
-				return m('li', [
-					m('a', {
-						href: '/question/' + question.id,
-						oncreate: m.route.link
-					}, question.id + ' ' + question.text)
-				]);
-			}),
-			m('li', [
-				m('input', {onkeyup: list.event.save})
-			])
-		];
 	}
 	return component;
 })();
