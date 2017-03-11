@@ -46,6 +46,9 @@ var QuestionList = (function(){
 			m.redraw();
 		});
 	}
+	component.onremove = function(){
+		socket.off('newQuestion');
+	}
 	component.view = function(){
 		return [
 			list.all.map(function(question){
