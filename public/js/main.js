@@ -5,16 +5,12 @@ var socket = io('http://localhost:3000');
 var QuestionList = (function(){
 	var list = {};
 	list.event = {};
-	list.all = [];
 	list.save = function(input){
 		return m.request({
 			method: 'POST',
 			url: './questions',
 			data: input
 		});
-	}
-	list.push = function(question){
-		list.all.push(question);
 	}
 	list.event.save = function(event){
 		var input = event.target;
@@ -36,13 +32,13 @@ var QuestionList = (function(){
 		m.request('/questions').then(function(input){
 			var i, l = input.questions.length;
 			for(i = 0; i < l; i++){
-				list.push(input.questions[i]);
+				list.all.push(input.questions[i]);
 			}
 		});
 	}
 	component.oncreate = function(){
 		socket.on('newQuestion', function(data){
-			list.push(data.question);
+			list.all.push(data.question);
 			m.redraw();
 		});
 	}
