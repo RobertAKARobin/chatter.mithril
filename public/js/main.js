@@ -59,5 +59,7 @@ var QuestionList = (function(){
 })();
 
 document.addEventListener('DOMContentLoaded', function(){
-	m.mount(document.getElementById('questions'), QuestionList);
+	m.route(document.getElementById('questions'), '/', {
+		'/': QuestionList
+	});
 });
