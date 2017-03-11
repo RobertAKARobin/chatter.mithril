@@ -2,7 +2,7 @@
 
 var socket = io('http://localhost:3000');
 
-var QuestionList = (function(){
+var ConvoList = (function(){
 	var list = {};
 	list.reset = function(){
 		list.all = [];
@@ -10,7 +10,7 @@ var QuestionList = (function(){
 	list.save = function(input){
 		return m.request({
 			method: 'POST',
-			url: './questions',
+			url: './convos',
 			data: input
 		});
 	}
@@ -22,8 +22,8 @@ var QuestionList = (function(){
 		event.redraw = false;
 		if(isReturn && input.value){
 			list.save({
-				question: {
-					text: input.value
+				convo: {
+					title: input.value
 				}
 			});
 			input.value = '';
@@ -33,12 +33,12 @@ var QuestionList = (function(){
 	var component = {};
 	component.view = function(){
 		return m('ul', [
-			list.all.map(function(question){
+			list.all.map(function(convo){
 				return m('li', [
 					m('a', {
-						href: '/question/' + question.id,
+						href: '/convo/' + convo.id,
 						oncreate: m.route.link
-					}, question.id + ' ' + question.text)
+					}, convo.id + ' ' + convo.title)
 				]);
 			}),
 			m('li', [
@@ -48,37 +48,37 @@ var QuestionList = (function(){
 	}
 	component.oninit = function(){
 		list.reset();
-		m.request('/questions').then(function(input){
-			var i, l = input.questions.length;
+		m.request('/convos').then(function(input){
+			var i, l = input.convos.length;
 			for(i = 0; i < l; i++){
-				list.all.push(input.questions[i]);
+				list.all.push(input.convos[i]);
 			}
 		});
 	}
 	component.oncreate = function(){
-		socket.on('newQuestion', function(data){
-			list.all.push(data.question);
+		socket.on('newConvo', function(data){
+			list.all.push(data.convo);
 			m.redraw();
 		});
 	}
 	component.onremove = function(){
-		socket.off('newQuestion');
+		socket.off('newConvo');
 	}
 	return component;
 })();
 
-var Question = (function(){
-	var question = {};
+var Convo = (function(){
+	var convo = {};
 
 	var component = {};
 	component.oninit = function(vnode){
-		m.request('/question/' + vnode.attrs.id).then(function(input){
-			question.data = input.question;
+		m.request('/convo/' + vnode.attrs.id).then(function(input){
+			convo.data = input.convo;
 		});
 	}
 	component.view = function(){
-		if(question.data){
-			return m('h1', question.data.id + ': ' + question.data.text);
+		if(convo.data){
+			return m('h1', convo.data.id + ': ' + convo.data.title);
 		}else{
 			return m('h1', 'Loading...');
 		}
@@ -102,7 +102,7 @@ var Header = (function(){
 document.addEventListener('DOMContentLoaded', function(){
 	m.mount(document.getElementById('header'), Header);
 	m.route(document.getElementById('main'), '/', {
-		'/': QuestionList,
-		'/question/:id': Question
+		'/': ConvoList,
+		'/convo/:id': Convo
 	});
 });
