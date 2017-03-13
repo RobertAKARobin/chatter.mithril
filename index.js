@@ -7,7 +7,8 @@ const httpServer = express()
 const baseServer = http.createServer(httpServer)
 const socketServer = socketio(baseServer)
 const db = {
-	convoList: {}
+	convoList: {},
+	convo: {}
 }
 
 let convoID = 0
@@ -17,8 +18,21 @@ function addConvo(title){
 		id: convoID,
 		title: title
 	}
+	const convo = {
+		id: convoID,
+		posts: []
+	}
 	db.convoList[convoID] = convoListItem
+	db.convo[convoID] = convo
 	return convoListItem
+}
+
+let postID = 0
+function addPost(convoID, text){
+	postID += 1
+	db.convo[convoID].posts[postID] = {
+		text
+	}
 }
 
 new function seed(){
@@ -49,7 +63,14 @@ httpServer
 		res.json({success: true})
 	})
 	.get('/convo/:id', (req, res) => {
+		const id = req.params.id
+		const convo = db.convoList[id]
+		convo.posts = Object.values(db.convo[id].posts)
 		res.json({
-			convo: db.convoList[req.params.id]
+			convo
 		})
+	})
+	.post('/convo/:id', (req, res) => {
+		addPost(req.params.id, req.body.post.text)
+		res.json({success: true})
 	})
