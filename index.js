@@ -30,9 +30,11 @@ function addConvo(title){
 let postID = 0
 function addPost(convoID, text){
 	postID += 1
-	db.convo[convoID].posts[postID] = {
+	const post = {
 		text
 	}
+	db.convo[convoID].posts[postID] = post
+	return post
 }
 
 new function seed(){
@@ -44,6 +46,13 @@ new function seed(){
 
 baseServer
 	.listen('3000', () => console.log(Date().toLocaleString()))
+
+socketServer
+	.on('connection', (socket) => {
+		socket.on('joinConvo', (convoID) => {
+			socket.join(convoID)
+		})
+	})
 
 httpServer
 	.use('/', express.static('./public'))
@@ -71,6 +80,9 @@ httpServer
 		})
 	})
 	.post('/convo/:id', (req, res) => {
-		addPost(req.params.id, req.body.post.text)
+		const id = req.params.id
+		socketServer.sockets.in(id).emit('newPost', {
+			post: addPost(req.params.id, req.body.post.text)
+		})
 		res.json({success: true})
 	})

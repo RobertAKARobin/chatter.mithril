@@ -96,7 +96,17 @@ var Convo = (function(){
 	component.oninit = function(vnode){
 		m.request('/convo/' + vnode.attrs.id).then(function(input){
 			convo.data = input.convo;
+			socket.emit('joinConvo', convo.data.id);
 		});
+	}
+	component.oncreate = function(){
+		socket.on('newPost', function(data){
+			convo.data.posts.push(data.post);
+			m.redraw();
+		})
+	}
+	component.onremove = function(){
+		socket.off('newPost');
 	}
 	component.view = function(){
 		if(convo.data){
