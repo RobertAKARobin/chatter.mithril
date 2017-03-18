@@ -2,30 +2,35 @@
 
 var ConvoList = (function(){
 	var list = {};
-	list.reset = function(){
+	list.construct = function(){
 		list.all = [];
 	}
-	list.save = function(input){
+
+	var newConvo = {};
+	newConvo.construct = function(){
+		newConvo.data = {
+			title: m.stream('')
+		}
+	}
+	newConvo.save = function(){
 		return m.request({
 			method: 'POST',
 			url: './convos',
-			data: input
+			data: {
+				convo: newConvo.data
+			}
 		});
 	}
 
 	var events = {};
 	events.save = function(event){
-		var input = event.target;
-		var isReturn = (event.keyCode == 13);
 		event.redraw = false;
-		if(isReturn && input.value){
-			list.save({
-				convo: {
-					title: input.value
-				}
-			});
-			input.value = '';
-		}
+		newConvo.save().then(function(response){
+			if(response.success){
+				newConvo.construct();
+				m.redraw();
+			}
+		});
 	};
 
 	var component = {};
@@ -40,12 +45,14 @@ var ConvoList = (function(){
 				]);
 			}),
 			m('li', [
-				m('input', {onkeyup: events.save})
+				m('input', m._boundInput(newConvo.data.title)),
+				m('button', {onclick: events.save}, 'Save')
 			])
 		]);
 	}
 	component.oninit = function(){
-		list.reset();
+		list.construct();
+		newConvo.construct();
 		m.request('/convos').then(function(input){
 			var i, l = input.convos.length;
 			for(i = 0; i < l; i++){
