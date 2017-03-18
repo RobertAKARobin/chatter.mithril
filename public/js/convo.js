@@ -2,31 +2,37 @@
 
 var Convo = (function(){
 	var convo = {};
-	convo.post = function(post){
+
+	var newPost = {};
+	newPost.construct = function(){
+		newPost.data = {
+			text: m.stream('')
+		};
+	}
+	newPost.save = function(){
 		return m.request({
 			method: 'POST',
 			url: './convo/' + convo.data.id,
-			data: post
+			data: {
+				post: newPost.data
+			}
 		});
 	}
 
 	var events = {};
 	events.post = function(event){
-		var input = event.target;
-		var isReturn = (event.keyCode == 13);
 		event.redraw = false;
-		if(isReturn && input.value){
-			convo.post({
-				post: {
-					text: input.value
-				}
-			});
-			input.value = '';
-		}
+		newPost.save().then(function(response){
+			if(response.success){
+				newPost.construct();
+				m.redraw();
+			}
+		});
 	}
 
 	var component = {};
 	component.oninit = function(vnode){
+		newPost.construct();
 		m.request('/convo/' + vnode.attrs.id).then(function(input){
 			convo.data = input.convo;
 			socket.emit('joinConvo', convo.data.id);
@@ -47,7 +53,8 @@ var Convo = (function(){
 				m('h1', convo.data.id + ': ' + convo.data.title),
 				m('ul', [
 					m('li', [
-						m('input', {onkeyup: events.post})
+						m('input', m._boundInput(newPost.data.text)),
+						m('button', {onclick: events.post}, 'Post')
 					]),
 					convo.data.posts.map(function(post){
 						return m('li', post.text);
