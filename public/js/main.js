@@ -1,11 +1,13 @@
 'use strict';
 
-m.value = function(callback){
-	var eventHandler = m.withAttr('value', callback);
-	return function(event){
+m._boundInput = function(stream, attrs){
+	var attrs = (attrs || {});
+	attrs.value = stream();
+	attrs.oninput = function(event){
 		event.redraw = false;
-		eventHandler(event);
-	}
+		m.withAttr('value', stream).call({}, event);
+	};
+	return attrs;
 }
 
 document.addEventListener('DOMContentLoaded', function(){

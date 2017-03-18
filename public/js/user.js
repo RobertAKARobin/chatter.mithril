@@ -37,15 +37,13 @@ var User = (function(){
 	user.views = {};
 	user.views.signUp = function(){
 		return [
-			m('input', {
-				placeholder: 'Name',
-				oninput: m.value(user.input.name)
-			}),
-			m('input', {
+			m('input', m._boundInput(user.input.name, {
+				placeholder: 'Name'
+			})),
+			m('input', m._boundInput(user.input.password, {
 				placeholder: 'Password',
-				type: 'password',
-				oninput: m.value(user.input.password)
-			}),
+				type: 'password'
+			})),
 			m('button', {
 				onclick: user.events.signUp
 			}, 'Sign up')
