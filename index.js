@@ -8,7 +8,8 @@ const baseServer = http.createServer(httpServer)
 const socketServer = socketio(baseServer)
 const db = {
 	convoList: {},
-	convo: {}
+	convo: {},
+	users: {}
 }
 
 let convoID = 0
@@ -35,6 +36,15 @@ function addPost(convoID, text){
 	}
 	db.convo[convoID].posts[postID] = post
 	return post
+}
+
+function addUser(name, password){
+	const user = {
+		name,
+		password
+	}
+	db.users[name] = user
+	return user
 }
 
 new function seed(){
@@ -85,4 +95,10 @@ httpServer
 			post: addPost(req.params.id, req.body.post.text)
 		})
 		res.json({success: true})
+	})
+	.post('/users', (req, res) => {
+		res.json({
+			success: true,
+			user: addUser(req.body.user.name, req.body.user.password)
+		})
 	})
