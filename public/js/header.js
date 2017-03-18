@@ -59,20 +59,20 @@ var Header = (function(){
 		return m('p', 'Welcome, ' + user.data.name + '!');
 	}
 
-	var component = {};
-	component.view = function(){
-		return [
-			m('h1', [
-				m('a', {
-					href: '/',
-					oncreate: m.route.link
-				}, 'Home')
-			]),
-			views.user()
-		];
+	return {
+		oninit: function(){
+			newUser.construct();
+		},
+		view: function(){
+			return [
+				m('h1', [
+					m('a', {
+						href: '/',
+						oncreate: m.route.link
+					}, 'Home')
+				]),
+				views.user()
+			];
+		}
 	}
-	component.oninit = function(){
-		newUser.construct();
-	}
-	return component;
 })();

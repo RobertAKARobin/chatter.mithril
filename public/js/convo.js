@@ -30,40 +30,40 @@ var Convo = (function(){
 		});
 	}
 
-	var component = {};
-	component.oninit = function(vnode){
-		newPost.construct();
-		m.request('/convo/' + vnode.attrs.id).then(function(input){
-			convo.data = input.convo;
-			socket.emit('joinConvo', convo.data.id);
-		});
-	}
-	component.oncreate = function(){
-		socket.on('newPost', function(data){
-			convo.data.posts.push(data.post);
-			m.redraw();
-		})
-	}
-	component.onremove = function(){
-		socket.off('newPost');
-	}
-	component.view = function(){
-		if(convo.data){
-			return [
-				m('h1', convo.data.id + ': ' + convo.data.title),
-				m('ul', [
-					m('li', [
-						m('input', m._boundInput(newPost.data.text)),
-						m('button', {onclick: events.post}, 'Post')
-					]),
-					convo.data.posts.map(function(post){
-						return m('li', post.text);
-					})
-				])
-			];
-		}else{
-			return m('h1', 'Loading...');
+	return {
+		oninit: function(vnode){
+			newPost.construct();
+			m.request('/convo/' + vnode.attrs.id).then(function(input){
+				convo.data = input.convo;
+				socket.emit('joinConvo', convo.data.id);
+			});
+		},
+		oncreate: function(){
+			socket.on('newPost', function(data){
+				convo.data.posts.push(data.post);
+				m.redraw();
+			})
+		},
+		onremove: function(){
+			socket.off('newPost');
+		},
+		view: function(){
+			if(convo.data){
+				return [
+					m('h1', convo.data.id + ': ' + convo.data.title),
+					m('ul', [
+						m('li', [
+							m('input', m._boundInput(newPost.data.text)),
+							m('button', {onclick: events.post}, 'Post')
+						]),
+						convo.data.posts.map(function(post){
+							return m('li', post.text);
+						})
+					])
+				];
+			}else{
+				return m('h1', 'Loading...');
+			}
 		}
 	}
-	return component;
 })();
