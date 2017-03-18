@@ -1,7 +1,7 @@
 'use strict';
 
-m.withAttrStatic = function(attribute, callback){
-	var eventHandler = m.withAttr(attribute, callback);
+m.value = function(callback){
+	var eventHandler = m.withAttr('value', callback);
 	return function(event){
 		event.redraw = false;
 		eventHandler(event);

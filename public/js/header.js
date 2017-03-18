@@ -39,12 +39,12 @@ var Header = (function(){
 		return [
 			m('input', {
 				placeholder: 'Name',
-				oninput: m.withAttrStatic('value', user.input.name)
+				oninput: m.value(user.input.name)
 			}),
 			m('input', {
 				placeholder: 'Password',
 				type: 'password',
-				oninput: m.withAttrStatic('value', user.input.password)
+				oninput: m.value(user.input.password)
 			}),
 			m('button', {
 				onclick: user.events.signUp
