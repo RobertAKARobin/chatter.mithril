@@ -12,6 +12,7 @@ m._boundInput = function(stream, attrs){
 
 document.addEventListener('DOMContentLoaded', function(){
 	m.mount(document.getElementById('header'), Header);
+	m.mount(document.getElementById('user'), User);
 	m.mount(document.getElementById('users'), UserList);
 	m.route(document.getElementById('main'), '/', {
 		'/': ConvoList,
