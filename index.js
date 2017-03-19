@@ -128,3 +128,8 @@ httpServer
 			res.json({success: false})
 		}
 	})
+	.delete('/session', (req, res) => {
+		res.clearCookie('user')
+		socketServer.sockets.emit('signOut')
+		res.json({success: true})
+	})

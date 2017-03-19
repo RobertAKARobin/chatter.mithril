@@ -9,6 +9,12 @@ var User = (function(){
 			user.isSignedIn = true;
 		}
 	}
+	user.signOut = function(){
+		return m.request({
+			method: 'DELETE',
+			url: './session'
+		});
+	}
 
 	var newUser = {};
 	newUser.construct = function(){
@@ -50,6 +56,10 @@ var User = (function(){
 			}
 		});
 	}
+	events.signOut = function(event){
+		event.redraw = false;
+		user.signOut();
+	}
 
 	var views = {};
 	views.signUp = function(){
@@ -70,13 +80,23 @@ var User = (function(){
 		];
 	}
 	views.isSignedIn = function(){
-		return m('p', 'Welcome, ' + user.data.name + '!');
+		return [
+			m('p', 'Welcome, ' + user.data.name + '!'),
+			m('button', {onclick: events.signOut}, 'Sign out')
+		];
 	}
 
 	return {
 		oninit: function(){
 			newUser.construct();
 			user.signIn();
+		},
+		oncreate: function(){
+			socket.on('signOut', function(){
+				user.isSignedIn = false;
+				newUser.construct();
+				m.redraw();
+			});
 		},
 		view: function(){
 			if(user.isSignedIn == true){
