@@ -43,8 +43,12 @@ function addUser(name, password){
 		name,
 		password
 	}
-	db.users[name] = user
-	return user
+	if(db.users[name]){
+		return false
+	}else{
+		db.users[name] = user
+		return user
+	}
 }
 
 new function seed(){
@@ -96,9 +100,19 @@ httpServer
 		})
 		res.json({success: true})
 	})
-	.post('/users', (req, res) => {
+	.get('/users', (req, res) => {
 		res.json({
-			success: true,
-			user: addUser(req.body.user.name, req.body.user.password)
+			users: Object.values(db.users)
 		})
+	})
+	.post('/users', (req, res) => {
+		const user = addUser(req.body.user.name, req.body.user.password)
+		if(user){
+			socketServer.sockets.emit('newUser', {
+				user
+			})
+			res.json({success: true})
+		}else{
+			res.json({success: false})
+		}
 	})

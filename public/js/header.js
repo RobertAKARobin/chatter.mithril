@@ -24,13 +24,7 @@ var Header = (function(){
 	var events = {};
 	events.signUp = function(event){
 		event.redraw = false;
-		newUser.save().then(function(response){
-			if(response.success){
-				user.data = response.user;
-				user.isSignedIn = true;
-				m.redraw();
-			}
-		});
+		newUser.save();
 	}
 
 	var views = {};
