@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
 const http = require('http')
 const socketio = require('socket.io')
 
@@ -72,6 +73,7 @@ httpServer
 	.use('/', express.static('./public'))
 	.use('/vendor', express.static('./node_modules'))
 	.use(bodyParser.json())
+	.use(cookieParser())
 
 httpServer
 	.get('/convos', (req, res) => {
@@ -111,6 +113,16 @@ httpServer
 			socketServer.sockets.emit('newUser', {
 				user
 			})
+			res.json({success: true})
+		}else{
+			res.json({success: false})
+		}
+	})
+	.post('/session', (req, res) => {
+		const input = req.body.user
+		const user = db.users[input.name]
+		if(user && user.password == input.password){
+			res.cookie('user', JSON.stringify(user))
 			res.json({success: true})
 		}else{
 			res.json({success: false})

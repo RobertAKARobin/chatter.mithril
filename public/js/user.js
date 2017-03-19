@@ -3,6 +3,12 @@
 var User = (function(){
 	var user = {};
 	user.isSignedIn = false;
+	user.signIn = function(){
+		user.data = Cookies.getJSON('user');
+		if(user.data){
+			user.isSignedIn = true;
+		}
+	}
 
 	var newUser = {};
 	newUser.construct = function(){
@@ -20,11 +26,29 @@ var User = (function(){
 			}
 		});
 	}
+	newUser.signIn = function(){
+		return m.request({
+			method: 'POST',
+			url: './session',
+			data: {
+				user: newUser.data
+			}
+		})
+	}
 
 	var events = {};
 	events.signUp = function(event){
 		event.redraw = false;
 		newUser.save();
+	}
+	events.signIn = function(event){
+		event.redraw = false;
+		newUser.signIn().then(function(response){
+			if(response.success){
+				user.signIn();
+				m.redraw();
+			}
+		});
 	}
 
 	var views = {};
@@ -39,7 +63,10 @@ var User = (function(){
 			})),
 			m('button', {
 				onclick: events.signUp
-			}, 'Sign up')
+			}, 'Sign up'),
+			m('button', {
+				onclick: events.signIn
+			}, 'Sign in')
 		];
 	}
 	views.isSignedIn = function(){
@@ -49,6 +76,7 @@ var User = (function(){
 	return {
 		oninit: function(){
 			newUser.construct();
+			user.signIn();
 		},
 		view: function(){
 			if(user.isSignedIn == true){
