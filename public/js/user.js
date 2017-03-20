@@ -24,7 +24,8 @@ var User = (function(){
 	user.signOut = function(){
 		return m.request({
 			method: 'DELETE',
-			url: './session'
+			url: './session',
+			background: true
 		});
 	}
 
@@ -39,6 +40,7 @@ var User = (function(){
 		return m.request({
 			method: 'POST',
 			url: './users',
+			background: true,
 			data: {
 				user: newUser.data
 			}
@@ -48,6 +50,7 @@ var User = (function(){
 		return m.request({
 			method: 'POST',
 			url: './session',
+			background: true,
 			data: {
 				user: newUser.data
 			}

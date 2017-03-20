@@ -13,6 +13,7 @@ var ConvoList = (function(){
 		return m.request({
 			method: 'POST',
 			url: './convos',
+			background: true,
 			data: {
 				convo: newConvo.data
 			}
