@@ -4,14 +4,11 @@ const cookieParser = require('cookie-parser')
 const http = require('http')
 const socketio = require('socket.io')
 
+const db = require('./db/_connection')
+
 const httpServer = express()
 const baseServer = http.createServer(httpServer)
 const socketServer = socketio(baseServer)
-const db = {
-	convoList: {},
-	convo: {},
-	users: {}
-}
 
 let convoID = 0
 function addConvo(title){
