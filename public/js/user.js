@@ -1,9 +1,21 @@
 'use strict';
 
 var User = (function(){
+	var message = {};
+	message.update = function(kind, text){
+		message.kind = (kind || '');
+		message.text = (text || '');
+	}
+
+	var checkForSuccess = function(response){
+		var kind = (response.success ? 'success' : 'error');
+		message.update(kind, response.message);
+		return response.success;
+	}
+
 	var user = {};
 	user.isSignedIn = false;
-	user.signIn = function(){
+	user.getFromMemory = function(){
 		user.data = Cookies.getJSON('user');
 		if(user.data){
 			user.isSignedIn = true;
@@ -39,21 +51,24 @@ var User = (function(){
 			data: {
 				user: newUser.data
 			}
-		})
+		});
 	}
 
 	var events = {};
 	events.signUp = function(event){
 		event.redraw = false;
-		newUser.save();
+		newUser.save().then(function(response){
+			checkForSuccess(response);
+			m.redraw();
+		});
 	}
 	events.signIn = function(event){
 		event.redraw = false;
 		newUser.signIn().then(function(response){
-			if(response.success){
-				user.signIn();
-				m.redraw();
-			}
+			if(checkForSuccess(response)){
+				user.getFromMemory();
+			};
+			m.redraw();
 		});
 	}
 	events.signOut = function(event){
@@ -89,7 +104,7 @@ var User = (function(){
 	return {
 		oninit: function(){
 			newUser.construct();
-			user.signIn();
+			user.getFromMemory();
 		},
 		oncreate: function(){
 			socket.on('signOut', function(){
@@ -99,11 +114,10 @@ var User = (function(){
 			});
 		},
 		view: function(){
-			if(user.isSignedIn == true){
-				return views.isSignedIn();
-			}else{
-				return views.signUp();
-			}
+			return [
+				m('p', {class: message.kind}, message.text),
+				(user.isSignedIn ? views.isSignedIn() : views.signUp())
+			];
 		}
 	}
 })();

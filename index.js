@@ -113,9 +113,15 @@ httpServer
 			socketServer.sockets.emit('newUser', {
 				user
 			})
-			res.json({success: true})
+			res.json({
+				success: true,
+				message: 'now sign in'
+			})
 		}else{
-			res.json({success: false})
+			res.json({
+				success: false,
+				message: "username is taken"
+			})
 		}
 	})
 	.post('/session', (req, res) => {
@@ -125,7 +131,10 @@ httpServer
 			res.cookie('user', JSON.stringify(user))
 			res.json({success: true})
 		}else{
-			res.json({success: false})
+			res.json({
+				success: false,
+				message: "the username and password don't match"
+			})
 		}
 	})
 	.delete('/session', (req, res) => {
