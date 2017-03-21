@@ -4,27 +4,13 @@ const cookieParser = require('cookie-parser')
 const http = require('http')
 const socketio = require('socket.io')
 
-const db = require('./db/_connection')
 
 const httpServer = express()
 const baseServer = http.createServer(httpServer)
 const socketServer = socketio(baseServer)
 
-let convoID = 0
-function addConvo(title){
-	convoID += 1
-	const convoListItem = {
-		id: convoID,
-		title: title
-	}
-	const convo = {
-		id: convoID,
-		posts: []
-	}
-	db.convoList[convoID] = convoListItem
-	db.convo[convoID] = convo
-	return convoListItem
-}
+const DB = require('./db/_connection')
+const Convo = require('./db/convo')
 
 let postID = 0
 function addPost(convoID, text){
@@ -32,7 +18,7 @@ function addPost(convoID, text){
 	const post = {
 		text
 	}
-	db.convo[convoID].posts[postID] = post
+	DB.convoPosts[convoID].posts[postID] = post
 	return post
 }
 
@@ -41,20 +27,20 @@ function addUser(name, password){
 		name,
 		password
 	}
-	if(db.users[name]){
+	if(DB.users[name]){
 		return false
 	}else{
-		db.users[name] = user
+		DB.users[name] = user
 		return user
 	}
 }
 
-new function seed(){
+;(function seed(){
 	[
-		'Is the API working?',
-		'Is the API still working?'
-	].forEach(addConvo)
-}
+		{title: 'Is the API working?'},
+		{title: 'Is the API still working?'}
+	].forEach(Convo.add)
+})();
 
 baseServer
 	.listen('3000', () => console.log(Date().toLocaleString()))
@@ -73,21 +59,26 @@ httpServer
 	.use(cookieParser())
 
 httpServer
+	.get('/db', (req, res) => {
+		res.json({
+			db: DB
+		})
+	})
 	.get('/convos', (req, res) => {
 		res.json({
-			convos: Object.values(db.convoList)
+			convos: Object.values(DB.convos)
 		})
 	})
 	.post('/convos', (req, res) => {
 		socketServer.sockets.emit('newConvo', {
-			convo: addConvo(req.body.convo.title)
+			convo: Convo.add(req.body.convo)
 		})
 		res.json({success: true})
 	})
 	.get('/convo/:id', (req, res) => {
 		const id = req.params.id
-		const convo = db.convoList[id]
-		convo.posts = Object.values(db.convo[id].posts)
+		const convo = DB.convos[id]
+		convo.posts = Object.values(DB.convoPosts[id].posts)
 		res.json({
 			convo
 		})
@@ -101,7 +92,7 @@ httpServer
 	})
 	.get('/users', (req, res) => {
 		res.json({
-			users: Object.values(db.users)
+			users: Object.values(DB.users)
 		})
 	})
 	.post('/users', (req, res) => {
@@ -123,7 +114,7 @@ httpServer
 	})
 	.post('/session', (req, res) => {
 		const input = req.body.user
-		const user = db.users[input.name]
+		const user = DB.users[input.name]
 		if(user && user.password == input.password){
 			res.cookie('user', JSON.stringify(user))
 			res.json({success: true})

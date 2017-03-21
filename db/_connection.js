@@ -2,8 +2,8 @@
 
 module.exports = (() => {
 	return {
-		convoList: {},
-		convo: {},
+		convoPosts: {},
+		convos: {},
 		users: {}
 	}
 })();
