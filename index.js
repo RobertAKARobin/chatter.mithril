@@ -66,7 +66,7 @@ httpServer
 	})
 	.get('/convos', (req, res) => {
 		res.json({
-			convos: Object.values(DB.convos)
+			convos: Convo.all()
 		})
 	})
 	.post('/convos', (req, res) => {
@@ -77,7 +77,7 @@ httpServer
 	})
 	.get('/convo/:id', (req, res) => {
 		const id = req.params.id
-		const convo = DB.convos[id]
+		const convo = Convo.load(id)
 		convo.posts = Object.values(DB.convoPosts[id].posts)
 		res.json({
 			convo

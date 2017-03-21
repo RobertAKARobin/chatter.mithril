@@ -20,6 +20,12 @@ const Convo = (() => {
 		Convo.count += 1
 		return convo
 	}
+	$Class.all = function(){
+		return Object.values(DB.convos)
+	}
+	$Class.load = function(id){
+		return DB.convos[id]
+	}
 
 	return $Class
 
