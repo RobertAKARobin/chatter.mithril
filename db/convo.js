@@ -14,7 +14,7 @@ const Convo = (() => {
 
 		const convoPostList = {}
 		convoPostList.id = convo.id
-		convoPostList.posts = []
+		convoPostList.posts = {}
 		DB.convoPosts[convo.id] = convoPostList
 
 		Convo.count += 1

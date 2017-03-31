@@ -14,11 +14,11 @@ const Convo = require('./db/convo')
 
 let postID = 0
 function addPost(convoID, text){
-	postID += 1
 	const post = {
 		text
 	}
 	DB.convoPosts[convoID].posts[postID] = post
+	postID += 1
 	return post
 }
 
