@@ -12,16 +12,6 @@ const socketServer = socketio(baseServer)
 const DB = require('./db/_connection')
 const Convo = require('./db/convo')
 
-let postID = 0
-function addPost(convoID, text){
-	const post = {
-		text
-	}
-	DB.convoPosts[convoID].posts[postID] = post
-	postID += 1
-	return post
-}
-
 function addUser(name, password){
 	const user = {
 		name,
@@ -37,9 +27,26 @@ function addUser(name, password){
 
 ;(function seed(){
 	[
-		{title: 'Is the API working?'},
-		{title: 'Is the API still working?'}
-	].forEach(Convo.add)
+		{
+			title: 'Is the API working?',
+			posts: [
+				'Foo',
+				'Bar'
+			]
+		},
+		{
+			title: 'Is the API still working?',
+			posts: [
+				'Boo',
+				'Fuzz'
+			]
+		}
+	].forEach((input) => {
+		const convo = Convo.add({title: input.title})
+		for(let i = 0, l = input.posts.length; i < l; i++){
+			convo.post({text: input.posts[i]})
+		}
+	});
 })();
 
 baseServer
@@ -78,15 +85,15 @@ httpServer
 	.get('/convo/:id', (req, res) => {
 		const id = req.params.id
 		const convo = Convo.load(id)
-		convo.posts = Object.values(DB.convoPosts[id].posts)
 		res.json({
-			convo
+			convo,
+			posts: Object.values(convo.getPostList().posts)
 		})
 	})
 	.post('/convo/:id', (req, res) => {
-		const id = req.params.id
-		socketServer.sockets.in(id).emit('newPost', {
-			post: addPost(req.params.id, req.body.post.text)
+		const convo = Convo.load(req.params.id)
+		socketServer.sockets.in(convo.id).emit('newPost', {
+			post: convo.post({text: req.body.post.text})
 		})
 		res.json({success: true})
 	})

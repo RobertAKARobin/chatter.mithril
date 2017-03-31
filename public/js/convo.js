@@ -36,12 +36,13 @@ var Convo = (function(){
 			newPost.construct();
 			m.request('/convo/' + vnode.attrs.id).then(function(input){
 				convo.data = input.convo;
+				convo.posts = input.posts;
 				socket.emit('joinConvo', convo.data.id);
 			});
 		},
 		oncreate: function(){
 			socket.on('newPost', function(data){
-				convo.data.posts.push(data.post);
+				convo.posts.push(data.post);
 				m.redraw();
 			})
 		},
@@ -57,7 +58,7 @@ var Convo = (function(){
 							m('input', m._boundInput(newPost.data.text)),
 							m('button', {onclick: events.post}, 'Post')
 						]),
-						convo.data.posts.map(function(post){
+						convo.posts.map(function(post){
 							return m('li', post.text);
 						})
 					])
