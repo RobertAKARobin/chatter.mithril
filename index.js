@@ -55,56 +55,40 @@ httpServer
 
 httpServer
 	.get('/db', (req, res) => {
-		res.json({
-			db: DB
-		})
+		const db = DB
+		res.json({ db })
 	})
 	.get('/convos', (req, res) => {
-		res.json({
-			convos: Convo.all()
-		})
+		const convos = Convo.all()
+		res.json({ convos })
 	})
 	.post('/convos', (req, res) => {
-		socketServer.sockets.emit('newConvo', {
-			convo: Convo.add(req.body.convo)
-		})
+		const convo = Convo.add(req.body.convo)
+		socketServer.sockets.emit('newConvo', { convo })
 		res.json({success: true})
 	})
 	.get('/convo/:id', (req, res) => {
-		const id = req.params.id
-		const convo = Convo.load(id)
-		res.json({
-			convo,
-			posts: convo.getPostList()
-		})
+		const convo = Convo.load(req.params.id)
+		const posts = convo.getPostList()
+		res.json({ convo, posts })
 	})
 	.post('/convo/:id', (req, res) => {
 		const convo = Convo.load(req.params.id)
-		socketServer.sockets.in(convo.id).emit('newPost', {
-			post: convo.post({text: req.body.post.text})
-		})
+		const post = convo.post({text: req.body.post.text})
+		socketServer.sockets.in(convo.id).emit('newPost', { post })
 		res.json({success: true})
 	})
 	.get('/users', (req, res) => {
-		res.json({
-			users: User.all()
-		})
+		const users = User.all()
+		res.json({ users })
 	})
 	.post('/users', (req, res) => {
 		const user = User.add(req.body.user)
 		if(user){
-			socketServer.sockets.emit('newUser', {
-				user
-			})
-			res.json({
-				success: true,
-				message: 'now sign in'
-			})
+			socketServer.sockets.emit('newUser', { user })
+			res.json({ success: true, message: 'now sign in' })
 		}else{
-			res.json({
-				success: false,
-				message: "username is taken"
-			})
+			res.json({ success: false, message: "username is taken" })
 		}
 	})
 	.post('/session', (req, res) => {
@@ -113,10 +97,7 @@ httpServer
 			res.cookie('user', JSON.stringify(user))
 			res.json({success: true})
 		}else{
-			res.json({
-				success: false,
-				message: "the username and password don't match"
-			})
+			res.json({ success: false, message: "the username and password don't match" })
 		}
 	})
 	.delete('/session', (req, res) => {
