@@ -11,19 +11,7 @@ const socketServer = socketio(baseServer)
 
 const DB = require('./db/_connection')
 const Convo = require('./db/convo')
-
-function addUser(name, password){
-	const user = {
-		name,
-		password
-	}
-	if(DB.users[name]){
-		return false
-	}else{
-		DB.users[name] = user
-		return user
-	}
-}
+const User = require('./db/user')
 
 ;(function seed(){
 	[
@@ -99,11 +87,11 @@ httpServer
 	})
 	.get('/users', (req, res) => {
 		res.json({
-			users: Object.values(DB.users)
+			users: User.all()
 		})
 	})
 	.post('/users', (req, res) => {
-		const user = addUser(req.body.user.name, req.body.user.password)
+		const user = User.add(req.body.user)
 		if(user){
 			socketServer.sockets.emit('newUser', {
 				user
@@ -120,9 +108,8 @@ httpServer
 		}
 	})
 	.post('/session', (req, res) => {
-		const input = req.body.user
-		const user = DB.users[input.name]
-		if(user && user.password == input.password){
+		const user = User.signIn(req.body.user)
+		if(user){
 			res.cookie('user', JSON.stringify(user))
 			res.json({success: true})
 		}else{
