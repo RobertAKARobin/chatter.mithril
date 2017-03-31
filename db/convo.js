@@ -31,11 +31,11 @@ const Convo = (() => {
 	const $instance = {}
 	$instance.getPostList = function(){
 		const convo = this
-		return DB.convoPosts[convo.id]
+		return Object.values(DB.convoPosts[convo.id].posts)
 	}
 	$instance.post = function(input){
 		const convo = this
-		const postList = convo.getPostList()
+		const postList = DB.convoPosts[convo.id]
 		const post = {
 			text: input.text
 		}

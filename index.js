@@ -75,7 +75,7 @@ httpServer
 		const convo = Convo.load(id)
 		res.json({
 			convo,
-			posts: Object.values(convo.getPostList().posts)
+			posts: convo.getPostList()
 		})
 	})
 	.post('/convo/:id', (req, res) => {
