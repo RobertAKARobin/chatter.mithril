@@ -31,6 +31,14 @@ var Convo = (function(){
 		});
 	}
 
+	var views = {};
+	views.newPost = function(){
+		return m('li', [
+			m('input', m._boundInput(newPost.data.text)),
+			m('button', {onclick: events.post}, 'Post')
+		]);
+	}
+
 	return {
 		oninit: function(vnode){
 			newPost.construct();
@@ -54,10 +62,7 @@ var Convo = (function(){
 				return [
 					m('h1', convo.data.id + ': ' + convo.data.title),
 					m('ul', [
-						m('li', [
-							m('input', m._boundInput(newPost.data.text)),
-							m('button', {onclick: events.post}, 'Post')
-						]),
+						(User.current.isSignedIn == false ? null : views.newPost()),
 						convo.posts.map(function(post){
 							return m('li', post.text);
 						})
