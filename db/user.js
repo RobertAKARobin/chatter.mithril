@@ -29,6 +29,18 @@ const User = (() => {
 		}
 		return output
 	}
+	$Class.getCurrent = function(req, res, next){
+		const user = Object.create($instance)
+		req.currentUser = undefined
+		try{
+			let clientUser = JSON.parse(req.cookies['user'])
+			user.data = DB.users[clientUser.name]
+			req.currentUser = user.data
+			next()
+		}catch(e){
+			next()
+		}
+	}
 
 	const $instance = {}
 

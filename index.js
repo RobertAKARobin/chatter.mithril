@@ -62,21 +62,29 @@ httpServer
 		const convos = Convo.all()
 		res.json({ convos })
 	})
-	.post('/convos', (req, res) => {
-		const convo = Convo.add(req.body.convo)
-		socketServer.sockets.emit('newConvo', { convo })
-		res.json({success: true})
+	.post('/convos', User.getCurrent, (req, res) => {
+		if(req.currentUser){
+			const convo = Convo.add(req.body.convo)
+			socketServer.sockets.emit('newConvo', { convo })
+			res.json({success: true})
+		}else{
+			res.json({success: false, message: 'you must be signed in to make a convo'})
+		}
 	})
 	.get('/convo/:id', (req, res) => {
 		const convo = Convo.load(req.params.id)
 		const posts = convo.getPostList()
 		res.json({ convo, posts })
 	})
-	.post('/convo/:id', (req, res) => {
-		const convo = Convo.load(req.params.id)
-		const post = convo.post({text: req.body.post.text})
-		socketServer.sockets.in(convo.id).emit('newPost', { post })
-		res.json({success: true})
+	.post('/convo/:id', User.getCurrent, (req, res) => {
+		if(req.currentUser){
+			const convo = Convo.load(req.params.id)
+			const post = convo.post({text: req.body.post.text})
+			socketServer.sockets.in(convo.id).emit('newPost', { post })
+			res.json({success: true})
+		}else{
+			res.json({success: false, message: 'you must be signed in to make a post'})
+		}
 	})
 	.get('/users', (req, res) => {
 		const users = User.all()
