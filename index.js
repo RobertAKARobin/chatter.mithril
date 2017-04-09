@@ -1,9 +1,10 @@
+'use strict';
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const http = require('http')
 const socketio = require('socket.io')
-
 
 const httpServer = express()
 const baseServer = http.createServer(httpServer)
@@ -13,29 +14,7 @@ const DB = require('./db/_connection')
 const Convo = require('./db/convo')
 const User = require('./db/user')
 
-;(function seed(){
-	[
-		{
-			title: 'Is the API working?',
-			posts: [
-				'Foo',
-				'Bar'
-			]
-		},
-		{
-			title: 'Is the API still working?',
-			posts: [
-				'Boo',
-				'Fuzz'
-			]
-		}
-	].forEach((input) => {
-		const convo = Convo.add({title: input.title})
-		for(let i = 0, l = input.posts.length; i < l; i++){
-			convo.post({text: input.posts[i]})
-		}
-	});
-})();
+require('./db/seed')
 
 baseServer
 	.listen('3000', () => console.log(Date().toLocaleString()))
