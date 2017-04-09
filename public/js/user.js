@@ -2,14 +2,14 @@
 
 var User = (function(){
 	var message = {};
-	message.update = function(kind, text){
-		message.kind = (kind || '');
-		message.text = (text || '');
+	message.update = function(input){
+		message.kind = (input.success ? 'success' : 'error');
+		message.text = (input.message || '');
 	}
 
 	var checkForSuccess = function(response){
 		var kind = (response.success ? 'success' : 'error');
-		message.update(kind, response.message);
+		message.update(response);
 		return response.success;
 	}
 
