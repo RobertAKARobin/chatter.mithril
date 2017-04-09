@@ -31,6 +31,14 @@ var ConvoList = (function(){
 		});
 	};
 
+	var views = {};
+	views.newConvo = function(){
+		return m('li', [
+			m('input', m._boundInput(newConvo.data.title)),
+			m('button', {onclick: events.save}, 'Save')
+		]);
+	}
+
 	return {
 		oninit: function(){
 			newConvo.construct();
@@ -61,10 +69,7 @@ var ConvoList = (function(){
 						}, convo.id + ' ' + convo.title)
 					]);
 				}),
-				m('li', [
-					m('input', m._boundInput(newConvo.data.title)),
-					m('button', {onclick: events.save}, 'Save')
-				])
+				(User.current.isSignedIn == false ? null : views.newConvo())
 			]);
 		}
 	}
