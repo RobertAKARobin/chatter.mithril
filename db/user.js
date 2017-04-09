@@ -23,7 +23,7 @@ const User = (() => {
 	$Class.signIn = function(input){
 		const user = DB.users[input.name]
 		let output = null
-		if(user.password == input.password){
+		if(user && user.password == input.password){
 			output = JSON.parse(JSON.stringify(user))
 			delete output.password
 		}
