@@ -53,63 +53,75 @@ httpServer
 	.use(bodyParser.json())
 	.use(cookieParser())
 
+function report(res, code, message){
+	let output = {}
+	if(typeof message == 'object'){
+		output = message
+	}else{
+		output.message = message
+	}
+	output.success = (code < 400)
+	// res.statusCode = code
+	res.json(output)
+}
+
 httpServer
 	.get('/db', (req, res) => {
 		const db = DB
-		res.json({ db })
+		report(res, 200, { db })
 	})
 	.get('/convos', (req, res) => {
 		const convos = Convo.all()
-		res.json({ convos })
+		report(res, 200, { convos })
 	})
 	.post('/convos', User.getCurrent, (req, res) => {
 		if(req.currentUser){
 			const convo = Convo.add(req.body.convo)
 			socketServer.sockets.emit('newConvo', { convo })
-			res.json({success: true})
+			report(res, 200)
 		}else{
-			res.json({success: false, message: 'you must be signed in to make a convo'})
+			report(res, 401, 'you must be signed in to make a convo')
 		}
 	})
 	.get('/convo/:id', (req, res) => {
 		const convo = Convo.load(req.params.id)
 		const posts = convo.getPostList()
-		res.json({ convo, posts })
+		report(res, 200, { convo, posts })
 	})
 	.post('/convo/:id', User.getCurrent, (req, res) => {
 		if(req.currentUser){
 			const convo = Convo.load(req.params.id)
 			const post = convo.post({text: req.body.post.text})
 			socketServer.sockets.in(convo.id).emit('newPost', { post })
-			res.json({success: true})
+			report(res, 200)
 		}else{
-			res.json({success: false, message: 'you must be signed in to make a post'})
+			report(res, 401, 'you must be signed in to make a post')
 		}
 	})
 	.get('/users', (req, res) => {
 		const users = User.all()
-		res.json({ users })
+		report(res, 200, { users })
 	})
 	.post('/users', (req, res) => {
 		const user = User.add(req.body.user)
 		if(user){
 			socketServer.sockets.emit('newUser', { user })
-			res.json({ success: true, message: 'now sign in' })
+			report(res, 200, 'now sign in')
 		}else{
-			res.json({ success: false, message: "username is taken" })
+			report(res, 401, 'username is taken')
 		}
 	})
 	.post('/session', (req, res) => {
 		const user = User.signIn(req.body.user)
 		if(user){
 			res.cookie('user', JSON.stringify(user))
-			res.json({success: true})
+			report(res, 200)
 		}else{
-			res.json({ success: false, message: "the username and password don't match" })
+			report(res, 400, 'the username and password don\'t match')
 		}
 	})
 	.delete('/session', (req, res) => {
 		res.clearCookie('user')
 		socketServer.sockets.emit('signOut')
-		res.json({success: true})
+		report(res, 200)
 	})
